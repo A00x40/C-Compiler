@@ -1,11 +1,13 @@
 %{
-#include <stdio.h>
+#include <stdlib.h>
+extern void yyerror(const char *str);
+
+#include "number.h"
+#include "y.tab.h"
 
 int COMMENT = 0;
 %}
 
-digit [0-9]
-number [0-9]+
 identifier [a-zA-Z_][a-zA-Z0-9_]*
 
 /*Rule Section*/
@@ -33,8 +35,22 @@ case {ECHO; printf("\nKEYWORD\n");}
 "/*" {COMMENT=1;}
 "*/" {COMMENT=0;}
 
-[+-]?{number} {ECHO; if(!COMMENT) printf("\nINTEGER\n");}
-[+-]?((({number}\.{digit}*|\.{number})([eE][+-]?{number})?)|({number}[eE][+-]?{number})) {ECHO; if(!COMMENT) printf("\nFloat\n");}  
+[\-\+\(\)\=\/\*\^] { return *yytext; }
+
+     
+[+-]?([1-9][0-9]+|[0-9])\.?[0-9]+|(\.[0-9]+)    {
+                                                    if(!COMMENT) {
+                                                        yylval.num = NEW_RATIONAL(strtod(yytext, NULL));
+                                                        return RATIONAL;
+                                                    } 
+                                                }
+
+[+-]?([1-9][0-9]|[0-9])    {
+                                if(!COMMENT) {    
+                                    yylval.num = NEW_INTEGER(strtol(yytext, NULL, 10));;
+                                    return INTEGER;
+                                } 
+                            }
 
 {identifier} {ECHO; if(!COMMENT) printf("\nIDENTIFIER\n");}
 
@@ -42,21 +58,12 @@ case {ECHO; printf("\nKEYWORD\n");}
 \} {ECHO; if(!COMMENT) printf("\nBLOCK ENDS\n");}
 
 ;                       {ECHO; printf("\nSEMICOLON\n");}
-\n                      /* ignore EOL */;
 [ \t]+                  /* ignore whitespace */;		
+
+
 %%
 
-/*call the yywrap function*/
-int yywrap()		
-{return 1;}
-
-
-/*Auxiliary function*/
-/*Driver function*/
-
-int main(void)
+int yywrap(void)		
 {
-/*call the yylex function.*/
-yylex();
-return 0;
+    return 1;
 }

@@ -15,4 +15,4 @@ Commands to create our compiler, bas.exe:
 
 * yacc -d bas.y
 * lex bas.l
-* cc lex.yy.c y.tab.c -obase.exe
+* cc number.c lex.yy.c y.tab.c -ly -ll -lm
