@@ -41,7 +41,7 @@ const { return CONST; }
                     }
                 }
 
-[\-\+\(\)\=\/\*\^\;] { return *yytext; }
+[\-\+\(\)\=\/\*\^\;\:] { return *yytext; }
 
 \&\& { return AND; }
 \|\| { return OR; } 
@@ -55,6 +55,19 @@ end" "if\n  { if(!COMMENT) return ENDIF; }
 then\n  { if(!COMMENT) return THEN; }
 else\n  { if(!COMMENT) return ELSE; }
 
+while\n  { if(!COMMENT) return WHILE; }
+end" "while\n  { if(!COMMENT) return ENDWHILE; }
+do\n  { if(!COMMENT) return DO; }
+end" "do\n  { if(!COMMENT) return ENDDO; }
+
+for  { if(!COMMENT) return FOR; }
+end" "for\n  { if(!COMMENT) return ENDFOR; }
+
+switch  { if(!COMMENT) return SWITCH; }
+case  { if(!COMMENT) return CASE; }
+break\n   { return BREAK; }
+default { return DEFAULT; }
+end" "switch\n  { return ENDSWITCH; }
 
 
 \{ {ECHO; if(!COMMENT) scope++; printf("\nBLOCK BEGINS\n");}

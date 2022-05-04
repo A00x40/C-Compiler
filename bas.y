@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "number.h"
 
@@ -8,7 +9,11 @@ extern FILE *yyin;
 extern int yylex(void);
 
 void yyerror(const char *str);
+
 extern char* yytext;
+
+bool exitSwitch = false;      /* true if the switch variable matches a case number, so after the assignment we can exit the switch */
+bool skipAssignment = true;   /* true if the case assignment has to be skipped */
 %}
 
 %union {
@@ -20,7 +25,11 @@ extern char* yytext;
 %token <num> INTEGER
 %token <num> RATIONAL
 %token IDENTIFIER CONST 
-%token RELOP AND OR IF THEN ELSE ENDIF BOOLTRUE BOOLFALSE
+%token RELOP AND OR BOOLTRUE BOOLFALSE
+%token IF THEN ELSE ENDIF
+%token DO WHILE ENDWHILE ENDDO
+%token FOR ENDFOR
+%token SWITCH CASE ENDSWITCH DEFAULT BREAK
 
 %right '='
 %left '+' '-'
@@ -43,9 +52,12 @@ program:
 statements:
     expr_stmt 
     | if_stmt { printf("IF statement\n"); }
+    | while_stmt { printf("WHILE statement\n"); }
+    | do_stmt { printf("DO WHILE statement\n"); }
+    | for_loop { printf("FOR LOOP\n"); }
+    | switch_stmt { printf("SWITCH statement\n"); }
     ;
 
-//
 expr_stmt:
     IDENTIFIER '=' expr ';' { printf("Variable Assignemnt statement\n"); }
     | CONST IDENTIFIER '=' expr ';' { printf("Constant Assignemnt statement\n"); }
@@ -62,7 +74,6 @@ expr:
     |  '(' expr ')'  { $$ = $2; }
     ;
 
-//
 condition_stmt: 
     IDENTIFIER RELOP IDENTIFIER 
     | IDENTIFIER RELOP INTEGER 
@@ -80,6 +91,49 @@ if_stmt:
     | IF condition_stmt THEN statements ENDIF
     ;
 
+while_stmt: 
+    WHILE condition_stmt THEN statements ENDWHILE
+    ;
+
+do_stmt: 
+    DO statements WHILE condition_stmt ENDDO
+    ;
+
+for_loop: 
+    FOR '(' expr ';' condition_stmt ';' expr ')' DO statements ENDFOR
+    ;
+
+switch_stmt: 
+    SWITCH '(' IDENTIFIER ')' DO  
+    cases
+    ENDSWITCH
+    ;
+
+cases : 
+    case cases
+    | DEFAULT
+    ;
+
+case :
+    CASE IDENTIFIER
+    {   
+        /* check if the switch variable value is equal to the case number */
+        
+        /* if the case num matches the switch variable we do the assignment */
+        /*if
+            skipAssignment = false; 
+            exitSwitch = true;
+        
+        else skipAssignment = true;*/
+    }
+    ':' statements BREAK    
+    {   
+        /* if case match, we exit the switch and assign the value to z */
+        /*if( exitSwitch ) 
+        {
+            exit(0);
+        }*/
+    }
 
 %%
 
