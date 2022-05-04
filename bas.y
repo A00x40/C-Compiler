@@ -14,6 +14,8 @@ extern char* yytext;
 
 bool exitSwitch = false;      /* true if the switch variable matches a case number, so after the assignment we can exit the switch */
 bool skipAssignment = true;   /* true if the case assignment has to be skipped */
+
+int sym[26];
 %}
 
 %union {
@@ -30,6 +32,7 @@ bool skipAssignment = true;   /* true if the case assignment has to be skipped *
 %token DO WHILE ENDWHILE ENDDO
 %token FOR ENDFOR
 %token SWITCH CASE ENDSWITCH DEFAULT BREAK
+//%token END
 
 %right '='
 %left '+' '-'
@@ -46,7 +49,7 @@ bool skipAssignment = true;   /* true if the case assignment has to be skipped *
 
 program:
     program statements 
-    |
+    | 
 	;
 
 statements:
@@ -66,6 +69,7 @@ expr_stmt:
 expr:
     INTEGER { $$ = $1; }
     |  RATIONAL { $$ = $1; }
+    |  IDENTIFIER
     |  expr '+' expr { $$ = ADD($1, $3); }
     |  expr '-' expr { $$ = SUBTRACT($1, $3); }
     |  expr '*' expr { $$ = MULTIPLY($1, $3); }
@@ -100,22 +104,26 @@ do_stmt:
     ;
 
 for_loop: 
-    FOR '(' expr ';' condition_stmt ';' expr ')' DO statements ENDFOR
+    FOR '(' for_stmt1 ';' condition_stmt ';' IDENTIFIER '=' expr  ')' DO statements ENDFOR
     ;
 
+for_stmt1:
+    expr
+    | IDENTIFIER '=' expr
+    |
+    ;
+    
 switch_stmt: 
-    SWITCH '(' IDENTIFIER ')' DO  
-    cases
-    ENDSWITCH
+    SWITCH '(' IDENTIFIER ')' DO cases ENDSWITCH
     ;
 
 cases : 
-    case cases
-    | DEFAULT
+    default
+    | case cases 
     ;
 
 case :
-    CASE IDENTIFIER
+    CASE INTEGER
     {   
         /* check if the switch variable value is equal to the case number */
         
@@ -134,9 +142,9 @@ case :
             exit(0);
         }*/
     }
-
+default:
+    DEFAULT ':' statements  BREAK
 %%
-
 
 void yyerror(const char *str)
 {

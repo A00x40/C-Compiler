@@ -41,7 +41,7 @@ const { return CONST; }
                     }
                 }
 
-[\-\+\(\)\=\/\*\^\;\:] { return *yytext; }
+[\-\+\(\)\=\/\*\^\;\,\:] { return *yytext; }
 
 \&\& { return AND; }
 \|\| { return OR; } 
@@ -55,7 +55,7 @@ end" "if\n  { if(!COMMENT) return ENDIF; }
 then\n  { if(!COMMENT) return THEN; }
 else\n  { if(!COMMENT) return ELSE; }
 
-while\n  { if(!COMMENT) return WHILE; }
+while  { if(!COMMENT) return WHILE; }
 end" "while\n  { if(!COMMENT) return ENDWHILE; }
 do\n  { if(!COMMENT) return DO; }
 end" "do\n  { if(!COMMENT) return ENDDO; }

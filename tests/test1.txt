@@ -15,3 +15,26 @@ else
 _g = 9;
 end if
 
+while TRUE then
+_g = 9;
+end while
+
+do
+_g = 9;
+while TRUE  
+end do
+
+for ( _aed = 9 + 8 ; TRUE ; _x = _a  ) do
+_s = 9;
+end for
+
+switch ( _s ) do
+case 6 :
+_s = 9;
+break
+default : 
+_s = 9;
+break
+end switch
+
+
