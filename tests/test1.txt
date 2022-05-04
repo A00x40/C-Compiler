@@ -1,0 +1,17 @@
+_x = 9 ;
+_d = -8 ;
+_s = 3.4 ;
+const _x = 9 ;
+const _d = -8 ;
+const _s = 3.4;
+
+if _s == 9 then
+_g = 9;
+end if
+
+if _s == 9 then
+_g = 9;
+else
+_g = 9;
+end if
+

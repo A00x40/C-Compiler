@@ -6,38 +6,19 @@ extern void yyerror(const char *str);
 #include "y.tab.h"
 
 int COMMENT = 0;
+int scope = 0;
 %}
 
-identifier [a-zA-Z_][a-zA-Z0-9_]*
+identifier _[a-zA-Z][a-zA-Z0-9]*
 
 /*Rule Section*/
 %%
 
-const {ECHO; printf("\nKEYWORD\n");}
-int {ECHO; printf("\nKEYWORD\n");}
-float {ECHO; printf("\nKEYWORD\n");}
-char {ECHO; printf("\nKEYWORD\n");}
-
-if {ECHO; printf("\nKEYWORD\n");}
-else {ECHO; printf("\nKEYWORD\n");}	
-
-do {ECHO; printf("\nKEYWORD\n");}
-while {ECHO; printf("\nKEYWORD\n");}
-for	{ECHO; printf("\nKEYWORD\n");}
-
-return {ECHO; printf("\nKEYWORD\n");}
-break {ECHO; printf("\nKEYWORD\n");}
-continue {ECHO; printf("\nKEYWORD\n");}
-
-switch {ECHO; printf("\nKEYWORD\n");}
-case {ECHO; printf("\nKEYWORD\n");}
-
 "/*" {COMMENT=1;}
 "*/" {COMMENT=0;}
 
-[\-\+\(\)\=\/\*\^] { return *yytext; }
+const { return CONST; }
 
-     
 [+-]?([1-9][0-9]+|[0-9])\.?[0-9]+|(\.[0-9]+)    {
                                                     if(!COMMENT) {
                                                         yylval.num = NEW_RATIONAL(strtod(yytext, NULL));
@@ -52,14 +33,35 @@ case {ECHO; printf("\nKEYWORD\n");}
                                 } 
                             }
 
-{identifier} {ECHO; if(!COMMENT) printf("\nIDENTIFIER\n");}
+{identifier}    {
+                    if(!COMMENT)  {
+                        
+                        //yylval = *yytext - 'a';
+                        return IDENTIFIER;
+                    }
+                }
 
-\{ {ECHO; if(!COMMENT) printf("\nBLOCK BEGINS\n");}
-\} {ECHO; if(!COMMENT) printf("\nBLOCK ENDS\n");}
+[\-\+\(\)\=\/\*\^\;] { return *yytext; }
 
-;                       {ECHO; printf("\nSEMICOLON\n");}
-[ \t]+                  /* ignore whitespace */;		
+\&\& { return AND; }
+\|\| { return OR; } 
+\>|\<|\>\=|\<\=|\!\=|\=\= { return RELOP; }
 
+TRUE { return BOOLTRUE; }
+FALSE { return BOOLFALSE; }
+
+if  { if(!COMMENT) return IF; }
+end" "if\n  { if(!COMMENT) return ENDIF; }
+then\n  { if(!COMMENT) return THEN; }
+else\n  { if(!COMMENT) return ELSE; }
+
+
+
+\{ {ECHO; if(!COMMENT) scope++; printf("\nBLOCK BEGINS\n");}
+\} {ECHO; if(!COMMENT) scope--; printf("\nBLOCK ENDS\n");}
+
+[ \t] 		
+\n 
 
 %%
 
