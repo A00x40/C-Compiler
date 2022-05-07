@@ -22,10 +22,10 @@ end" "decl\n { return ENDDECL; }
 
 main { return MAIN; }
 
-"/*" {COMMENT=1;}
-"*/" {COMMENT=0;}
+"/*" { COMMENT=1; } 
+"*/" { if(COMMENT) COMMENT=0; else yyerror("No opening for closed comment"); }
 
-const { return CONST; }
+const { if(!COMMENT) return CONST; }
 
 [+-]?([1-9][0-9]+|[0-9])\.?[0-9]+|(\.[0-9]+)    {
                                                     if(!COMMENT) {
@@ -49,16 +49,16 @@ const { return CONST; }
                     }
                 }
 
-\"[^\"]*\"|\"\" { return STRING; }
+\"[^\"]*\"|\"\" { if(!COMMENT) return STRING; }
 
-[\-\+\(\)\=\/\*\^\;\,\:] { return *yytext; }
+[\-\+\(\)\=\/\*\^\;\,\:] { if(!COMMENT) return *yytext; }
 
-\&\& { return AND; }
-\|\| { return OR; } 
+\&\& { if(!COMMENT) return AND; }
+\|\| { if(!COMMENT) return OR; } 
 \>|\<|\>\=|\<\=|\!\=|\=\= { return RELOP; }
 
-TRUE { return BOOLTRUE; }
-FALSE { return BOOLFALSE; }
+TRUE { if(!COMMENT) return BOOLTRUE; }
+FALSE { if(!COMMENT) return BOOLFALSE; }
 
 if  { if(!COMMENT) return IF; }
 end" "if\n  { if(!COMMENT) return ENDIF; }
@@ -75,13 +75,13 @@ end" "for\n  { if(!COMMENT) return ENDFOR; }
 
 switch  { if(!COMMENT) return SWITCH; }
 case  { if(!COMMENT) return CASE; }
-break\n   { return BREAK; }
-default { return DEFAULT; }
-end" "switch\n  { return ENDSWITCH; }
+break\n   { if(!COMMENT) return BREAK; }
+default { if(!COMMENT) return DEFAULT; }
+end" "switch\n  { if(!COMMENT) return ENDSWITCH; }
 
-print { return PRINT; }
+print { if(!COMMENT) return PRINT; }
 
-return" "0\; { return END; }
+return" "0\; { if(!COMMENT) return END; }
 
 
 \{  { 

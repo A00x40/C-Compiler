@@ -62,5 +62,76 @@ main() {
     else
     _g = 9;
     end if
+
+    _x = 9 ;
+    _d = -8 ;
+    _s = 3.455 ;
+    _w = _x + 1;
+    const _x = 9 ;
+    const _d = -8 ;
+    const _s = 3.455;
+
+    if _s == 9 then
+    _g = 5 + _x - (10 / 2);
+    end if
+
+    if _s == 9 then
+    if _x != 8 then
+    _x = 4;
+    end if
+    _g = 9;
+    else
+    if _d >= 8 then
+    _d = 0;
+    else 
+    _d = 9;
+    end if
+    _g = 8;
+    end if
+
+    while _x == 9 && _d == -8 then
+    _g = 9;
+    _d = 8;
+    end while
+
+    while _x == 9 || _d == -8 then
+    while TRUE then
+    _g = 9;
+    end while
+    end while
+
+    do
+    _g = 9;
+    while TRUE  
+    end do
+
+    for ( _aed = 9 + 8 ; TRUE ; _x = _x + 1  ) do
+    _s = 9;
+    end for
+
+    /*"dsdfrr"*/
+    
+    /* should give an error for unbalanced comment */
+    /**/*/
+
+    switch ( _s ) do
+    case 6 :
+    _s = 9;
+    break
+    case 9:
+    _s = 9;
+    break
+    default : 
+    _s = 9;
+    break
+    end switch
+
+    /*
+    sxsxddaadda
+    case
+    if while then do for\n
+    */
+
     return 0;
+
 }

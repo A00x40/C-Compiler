@@ -57,8 +57,8 @@ extern int COMMENT ;
 program: declarations mainBlock;
 
 declarations : 
-    DECL declList { printf("Declaratins end\n"); } ENDDECL           
-	| DECL { printf("Declaratins end\n"); } ENDDECL 
+    DECL declList ENDDECL           
+	| DECL ENDDECL 
     ;
 
 declList: 
@@ -168,19 +168,13 @@ switch_stmt:
     ;
 
 cases : 
-    default
-    | case cases 
+    case cases
+    | default 
     ;
 
 case :
-    CASE INTEGER
-    {   
-        /* check if the switch variable value is equal to the case number */
-    }
-    ':' Slist BREAK    
-    {   
-        /* if case match, we exit the switch and assign the value to z */
-    }
+    CASE INTEGER ':' Slist BREAK    
+    
 default:
     DEFAULT ':' Slist  BREAK
 
