@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 
@@ -22,17 +23,18 @@ int sym[26];
     struct number num;
 }
 
-%start program
+%start program 
 
 %token <num> INTEGER
 %token <num> RATIONAL
 %token IDENTIFIER CONST 
+%token PRINT STRING
 %token RELOP AND OR BOOLTRUE BOOLFALSE
 %token IF THEN ELSE ENDIF
 %token DO WHILE ENDWHILE ENDDO
 %token FOR ENDFOR
 %token SWITCH CASE ENDSWITCH DEFAULT BREAK
-//%token END
+%token END
 
 %right '='
 %left '+' '-'
@@ -49,21 +51,28 @@ int sym[26];
 
 program:
     program statements 
-    | 
+    |
 	;
 
 statements:
     expr_stmt 
+    | print_stmt { printf("PRINT statement\n"); }
     | if_stmt { printf("IF statement\n"); }
     | while_stmt { printf("WHILE statement\n"); }
     | do_stmt { printf("DO WHILE statement\n"); }
     | for_loop { printf("FOR LOOP\n"); }
     | switch_stmt { printf("SWITCH statement\n"); }
+    | END { printf("End Parsing\n"); YYACCEPT; }
     ;
 
 expr_stmt:
     IDENTIFIER '=' expr ';' { printf("Variable Assignemnt statement\n"); }
     | CONST IDENTIFIER '=' expr ';' { printf("Constant Assignemnt statement\n"); }
+    ;
+
+print_stmt:
+    PRINT '(' expr ')' ';'
+    | PRINT '(' STRING ')' ';'
     ;
 
 expr:
@@ -104,7 +113,7 @@ do_stmt:
     ;
 
 for_loop: 
-    FOR '(' for_stmt1 ';' condition_stmt ';' IDENTIFIER '=' expr  ')' DO statements ENDFOR
+    FOR '(' for_stmt1 ';' condition_stmt ';' IDENTIFIER '='  expr  ')' DO statements ENDFOR
     ;
 
 for_stmt1:

@@ -41,6 +41,8 @@ const { return CONST; }
                     }
                 }
 
+\"[^\"]*\"|\"\" { return STRING; }
+
 [\-\+\(\)\=\/\*\^\;\,\:] { return *yytext; }
 
 \&\& { return AND; }
@@ -68,6 +70,10 @@ case  { if(!COMMENT) return CASE; }
 break\n   { return BREAK; }
 default { return DEFAULT; }
 end" "switch\n  { return ENDSWITCH; }
+
+print { return PRINT; }
+
+end\; { return END; }
 
 
 \{ {ECHO; if(!COMMENT) scope++; printf("\nBLOCK BEGINS\n");}
