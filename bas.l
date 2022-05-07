@@ -7,12 +7,20 @@ extern void yyerror(const char *str);
 
 int COMMENT = 0;
 int scope = 0;
+int nline = 0;
 %}
 
 identifier _[a-zA-Z][a-zA-Z0-9]*
 
 /*Rule Section*/
 %%
+
+decl { return DECL; }
+def { return DEFINE; }
+return { return RET; }
+end" "decl\n { return ENDDECL; }
+
+main { return MAIN; }
 
 "/*" {COMMENT=1;}
 "*/" {COMMENT=0;}
@@ -73,15 +81,26 @@ end" "switch\n  { return ENDSWITCH; }
 
 print { return PRINT; }
 
-end\; { return END; }
+return" "0\; { return END; }
 
 
-\{ {ECHO; if(!COMMENT) scope++; printf("\nBLOCK BEGINS\n");}
-\} {ECHO; if(!COMMENT) scope--; printf("\nBLOCK ENDS\n");}
+\{  { 
+        if(!COMMENT) {
+            scope++; 
+            return *yytext; 
+        }
+    }
 
+\}  { 
+        if(!COMMENT) {
+            scope--; 
+            return *yytext; 
+        }
+    }
+
+\n { nline++; }
 [ \t] 		
-\n 
-
+ 
 %%
 
 int yywrap(void)		

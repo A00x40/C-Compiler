@@ -1,0 +1,66 @@
+decl
+_x = 9 ;
+def _cc(_v,_s3,2,2.3) {
+    _x = 0;
+    return 9 ;
+}
+
+end decl
+
+main() {
+    _x = 9 ;
+    _d = -8 ;
+    _s = 3.4 ;
+
+    _cc(_v,_s3,2,2.3);
+
+    const _x = 9 ;
+    const _d = -8 ;
+    const _s = 3.4;
+
+    if _s == 9 then
+    _g = 9;
+    end if
+
+    if _s == 9 then
+    _g = 9;
+    else
+    _g = 9;
+    end if
+
+    while TRUE then
+    _g = 9;
+    end while
+
+    do
+    _g = 9;
+    while TRUE  
+    end do
+
+    for ( _aed = 9 + 8 ; TRUE ; _x = _a  ) do
+    _s = 9;
+    end for
+
+    switch ( _s ) do
+    case 6 :
+    _s = 9;
+    break
+    default : 
+    _s = 9;
+    break
+    end switch
+
+    print(_s);
+    print("SDDS");
+
+    if _s == 9 then
+    if _s == 9 then
+    _g = 9;
+    else
+    _g = 9;
+    end if
+    else
+    _g = 9;
+    end if
+    return 0;
+}

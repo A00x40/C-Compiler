@@ -12,11 +12,10 @@ extern int yylex(void);
 void yyerror(const char *str);
 
 extern char* yytext;
+extern int scope ;
+extern int nline ;
+extern int COMMENT ;
 
-bool exitSwitch = false;      /* true if the switch variable matches a case number, so after the assignment we can exit the switch */
-bool skipAssignment = true;   /* true if the case assignment has to be skipped */
-
-int sym[26];
 %}
 
 %union {
@@ -27,6 +26,11 @@ int sym[26];
 
 %token <num> INTEGER
 %token <num> RATIONAL
+
+%token DECL ENDDECL DEFINE RET
+
+%token MAIN
+
 %token IDENTIFIER CONST 
 %token PRINT STRING
 %token RELOP AND OR BOOLTRUE BOOLFALSE
@@ -34,6 +38,7 @@ int sym[26];
 %token DO WHILE ENDWHILE ENDDO
 %token FOR ENDFOR
 %token SWITCH CASE ENDSWITCH DEFAULT BREAK
+
 %token END
 
 %right '='
@@ -49,12 +54,47 @@ int sym[26];
 
 %%
 
-program:
-    program statements 
-    |
-	;
+program: declarations mainBlock;
 
-statements:
+declarations : 
+    DECL declList { printf("Declaratins end\n"); } ENDDECL           
+	| DECL { printf("Declaratins end\n"); } ENDDECL 
+    ;
+
+declList: 
+    declare declList
+	| declare 
+    ;
+
+declare: 
+    expr_stmt
+    | func_def
+    ;
+
+func_def:
+    DEFINE IDENTIFIER '(' PARAM ')' '{' func_body '}' { printf("Function Def\n"); }
+    ;
+
+func_call:
+    IDENTIFIER '(' PARAM ')' ';' { printf("Function call\n"); }
+    ;
+
+PARAM:
+    PARAM ',' expr
+    | expr
+    |
+    ; 
+
+func_body:
+    Slist RET expr ';'
+    ;
+
+
+mainBlock: MAIN '(' ')' '{' { printf("main block\n"); } Slist '}' ;
+
+Slist: Slist stmt | stmt;
+
+stmt:
     expr_stmt 
     | print_stmt { printf("PRINT statement\n"); }
     | if_stmt { printf("IF statement\n"); }
@@ -62,12 +102,13 @@ statements:
     | do_stmt { printf("DO WHILE statement\n"); }
     | for_loop { printf("FOR LOOP\n"); }
     | switch_stmt { printf("SWITCH statement\n"); }
-    | END { printf("End Parsing\n"); YYACCEPT; }
+    | func_call 
+    | END { printf("Main block ends\n"); }
     ;
 
 expr_stmt:
-    IDENTIFIER '=' expr ';' { printf("Variable Assignemnt statement\n"); }
-    | CONST IDENTIFIER '=' expr ';' { printf("Constant Assignemnt statement\n"); }
+    IDENTIFIER '=' expr ';' { printf("Variable Assignement statement\n"); }
+    | CONST IDENTIFIER '=' expr ';' { printf("Constant Assignement statement\n"); }
     ;
 
 print_stmt:
@@ -100,20 +141,20 @@ condition_stmt:
     ;
 
 if_stmt: 
-    IF condition_stmt THEN statements ELSE statements ENDIF 
-    | IF condition_stmt THEN statements ENDIF
+    IF condition_stmt THEN Slist ELSE Slist ENDIF 
+    | IF condition_stmt THEN Slist ENDIF
     ;
 
 while_stmt: 
-    WHILE condition_stmt THEN statements ENDWHILE
+    WHILE condition_stmt THEN Slist ENDWHILE
     ;
 
 do_stmt: 
-    DO statements WHILE condition_stmt ENDDO
+    DO Slist WHILE condition_stmt ENDDO
     ;
 
 for_loop: 
-    FOR '(' for_stmt1 ';' condition_stmt ';' IDENTIFIER '='  expr  ')' DO statements ENDFOR
+    FOR '(' for_stmt1 ';' condition_stmt ';' IDENTIFIER '='  expr  ')' DO Slist ENDFOR
     ;
 
 for_stmt1:
@@ -135,24 +176,14 @@ case :
     CASE INTEGER
     {   
         /* check if the switch variable value is equal to the case number */
-        
-        /* if the case num matches the switch variable we do the assignment */
-        /*if
-            skipAssignment = false; 
-            exitSwitch = true;
-        
-        else skipAssignment = true;*/
     }
-    ':' statements BREAK    
+    ':' Slist BREAK    
     {   
         /* if case match, we exit the switch and assign the value to z */
-        /*if( exitSwitch ) 
-        {
-            exit(0);
-        }*/
     }
 default:
-    DEFAULT ':' statements  BREAK
+    DEFAULT ':' Slist  BREAK
+
 %%
 
 void yyerror(const char *str)
@@ -162,7 +193,7 @@ void yyerror(const char *str)
 
 int main()
 {
-	FILE * pt = fopen("tests/test1.txt", "r" );
+	FILE * pt = fopen("tests/test2.txt", "r" );
     if(!pt)
     {
         printf("Non existant file");
